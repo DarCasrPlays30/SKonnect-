@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKonnect - Sangguniang Kabataan Web Platform</title>
+    <link rel="icon" type="image/png" href="sk-official-logo.png">
+    <style>
+        :root {
+            /* Core Theme Colors */
+            --bg-main: #f8f9fa;
+            --text-dark: #2d3436;
+            --text-muted: #636e72;
+            --card-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            --hover-shadow: 0 12px 25px rgba(0,0,0,0.15);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+            /* Exact Hex Colors Extracted from Logos */
+            --c-health: #CD4A4A;
+            --c-edu: #F4E22D;
+            --c-econ: #654B81;
+            --c-soc: #CD4A4A;
+            --c-peace: #28A9E1;
+            --c-gov: #3F529C;
+            --c-cit: #2B7336;
+            --c-env: #6FA94E;
+            --c-glob: #D56B34;
+            --c-agri: #39FF14;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #2b2b36;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 1024px;
+            margin: 0 auto;
+            background-color: var(--bg-main);
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            position: relative;
+            overflow-x: hidden;
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen {
+            display: none;
+            padding: 2.5rem;
+            animation: slideFade 0.4s ease forwards;
+            flex: 1;
+        }
+        .screen.active { display: block; }
+
+        @keyframes slideFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2, h3, p { margin: 0; }
+        .header-group { text-align: center; margin-bottom: 2.5rem; }
+        .header-group h1 { font-size: 3rem; font-weight: 800; color: var(--text-dark); letter-spacing: -1px; }
+        .header-group h2 { -size: 1.4rfontem; font-weight: 600; color: #555; margin-top: 5px; }
+        .header-group h3 { font-size: 1.1rem; font-weight: 400; color: var(--text-muted); margin-top: 5px; }
+
+        .btn {
+            background-color: var(--text-dark);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            max-width: 320px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .btn:hover { background-color: #000; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+        
+        .btn-accent { background-color: var(--c-peace); }
+        .btn-accent:hover { background-color: #1a8bc0; }
+
+        .back-btn {
+            background: white;
+            border: 1px solid #ccc;
+            color: var(--text-dark);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .back-btn:hover { background: #f0f0f0; }
+
+        /* ================= SPLIT HERO STYLES ================= */
+        .hero-wrapper {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            padding: 2rem 0;
+            box-sizing: border-box;
+        }
+
+        .hero-content { flex: 1; max-width: 500px; }
+
+        .hero-visual {
+            flex: 1.2;
+            height: 450px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.8s ease-in-out;
+            background-color: var(--c-peace);
+        }
+
+        .hero-visual::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 3rem;
+            color: white;
+            text-align: center;
+            z-index: 2;
+            width: 70%;
+            transition: transform 0.3s ease;
+        }
+
+        #flash-icon {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin: 0 auto 20px auto; /* Perfectly centers the logo */
+            display: block; /* Required for margin auto to work */
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
+
+        #flash-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin: 0;
+            text-transform: uppercase;
+            color: white;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5); /* Makes text highly visible */
+        }
+
+        .button-row { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        .btn-primary { background-color: var(--text-dark); flex: 1; }
+        .btn-accent { background-color: var(--c-peace); flex: 1; }
+        
+        @media (max-width: 800px) {
+            .hero-wrapper { flex-direction: column; text-align: center; }
+            .hero-content { max-width: 100%; }
+            .header-group { text-align: center !important; }
+            .button-row { flex-direction: column; }
+            .hero-visual { width: 100%; height: 350px; }
+        }
+
+        /* ================= GRID STYLES ================= */
+        .brgy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 2rem; padding: 1rem; }
+        .brgy-card { background: white; padding: 2rem 1rem; border-radius: 20px; text-align: center; cursor: pointer; box-shadow: var(--card-shadow); transition: var(--transition); border: 1px solid #f0f0f0; }
+        .brgy-card:hover { transform: translateY(-8px); box-shadow: var(--hover-shadow); }
+        .brgy-logo { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 15px; object-fit: contain; background-color: #f8f9fa; display: block; }
+        .brgy-card h4 { margin: 0 0 5px 0; font-size: 1.1rem; }
+        .brgy-card span { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+
+        .centers-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        @media (max-width: 768px) { .centers-grid { grid-template-columns: repeat(2, 1fr); } }
+        
+        .center-card { 
+            border-radius: 16px; 
+            padding: 1.5rem 1rem; 
+            text-align: center; 
+            cursor: pointer; 
+            font-weight: 700; 
+            font-size: 0.9rem; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 140px; 
+            box-shadow: var(--card-shadow); 
+            transition: var(--transition); 
+            position: relative; 
+            overflow: hidden; 
+            color: white !important; /* Forces white text */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6); /* Adds shadow for extreme visibility */
+        }
+        
+        .center-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.35); 
+            z-index: 1;
+        }
+        
+        .center-card > * { position: relative; z-index: 2; }
+        .center-card:hover { transform: scale(1.05); box-shadow: var(--hover-shadow); z-index: 3; }
+        
+        .bg-health { background-color: var(--c-health); }
+        .bg-edu { background-color: var(--c-edu); }
+        .bg-econ { background-color: var(--c-econ); }
+        .bg-soc { background-color: var(--c-soc); }
+        .bg-peace { background-color: var(--c-peace); }
+        .bg-gov { background-color: var(--c-gov); }
+        .bg-cit { background-color: var(--c-cit); }
+        .bg-env { background-color: var(--c-env); }
+        .bg-glob { background-color: var(--c-glob); }
+        .bg-agri { background-color: var(--c-agri); } 
+
+        .hex-icon { width: 75px; height: 75px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
+        .hex-icon img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3)); }
+        
+        .centers-footer { text-align: center; font-weight: 700; letter-spacing: 2px; font-size: 0.9rem; color: var(--text-muted); margin-top: 2rem; }
+
+        /* ================= DYNAMIC TABLE BANNER ================= */
+        .dynamic-banner { 
+            padding: 1rem 1.5rem; 
+            border-radius: 8px; 
+            color: white; 
+            margin-bottom: 1.5rem; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            overflow: hidden;
+        }
+
+        .dynamic-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.35); 
+            z-index: 1;
+        }
+
+        .dynamic-banner > * { position: relative; z-index: 2; }
+
+        .banner-icon-container { position: absolute; left: 20px; display: flex; align-items: center; justify-content: center; }
+        .banner-hex { width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; }
+        .banner-hex img { width: 100%; height: 100%; object-fit: contain; display: none; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3)); }
+        .dynamic-banner h2 { 
+            font-size: 1.4rem; 
+            letter-spacing: 1px; 
+            text-transform: uppercase; 
+            margin: 0; 
+            text-align: center; 
+            color: white !important; /* Forces white text */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6); /* Adds shadow for visibility */
+        }
+
+        .table-desc { background: white; padding: 1.5rem; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; text-align: justify; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 4px solid var(--text-dark); text-transform: uppercase; }
+        .table-wrapper { background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th, td { padding: 16px; text-align: left; vertical-align: top; border-bottom: 1px solid #eee; }
+        th { background-color: #f8f9fa; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; color: #555; }
+        tbody tr:hover { background-color: #fdfbf7; }
+        td { font-size: 0.85rem; line-height: 1.5; color: #444; }
+
+        /* ================= ACCORDION TIMELINE STYLES ================= */
+        .timeline-container { border-left: 4px solid var(--text-dark); margin-left: 20px; padding-left: 30px; margin-top: 2rem; }
+        .timeline-item { position: relative; margin-bottom: 1.5rem; background: white; border-radius: 12px; box-shadow: var(--card-shadow); border: 1px solid #f0f0f0; overflow: hidden; }
+        .timeline-item::before { content: ''; width: 20px; height: 20px; background: var(--c-peace); border-radius: 50%; position: absolute; left: -42px; top: 25px; border: 4px solid white; box-shadow: 0 0 0 2px var(--text-dark); z-index: 10; }
+        
+        .timeline-header { padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: white; transition: background 0.2s; }
+        .timeline-header:hover { background: #fdfbf7; }
+        .timeline-header-content { flex: 1; }
+        .timeline-date { font-weight: 800; color: var(--c-peace); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .timeline-title { font-size: 1.15rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1.3; }
+        .expand-icon { font-size: 1.2rem; color: var(--text-muted); transition: transform 0.3s ease; margin-left: 15px; }
+        .timeline-item.expanded .expand-icon { transform: rotate(180deg); }
+        .timeline-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0, 1, 0, 1); background: #fafafa; }
+        .timeline-item.expanded .timeline-content { max-height: 2000px; transition: max-height 0.5s ease-in-out; }
+        .timeline-content-inner { padding: 0 20px 20px 20px; }
+        .timeline-desc { font-size: 0.9rem; color: #444; line-height: 1.6; margin-bottom: 15px; border-left: 3px solid var(--c-peace); padding-left: 15px; text-align: justify; }
+        .timeline-photo {
+            width: 100%;
+            height: auto; /* Allows the full natural height of your poster */
+            max-height: 800px; /* Gives taller posters plenty of room */
+            object-fit: contain; /* Prevents zooming and cropping */
+            border-radius: 8px;
+            display: block;
+            margin: 0 auto; /* Centers the image perfectly */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Adds a nice subtle shadow to the poster */
+        }
+
+        /* ================= GOVERNMENT FOOTER ================= */
+        .gov-footer {
+            background-color: #efefef;
+            color: #333;
+            padding: 3rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            font-size: 0.85rem;
+            border-top: 5px solid var(--c-gov);
+            margin-top: 3rem;
+            line-height: 1.5;
+        }
+        .gov-footer h4 { margin-top: 0; color: #111; text-transform: uppercase; font-weight: 800; margin-bottom: 1.2rem; font-size: 1rem;}
+        .gov-footer ul { list-style: none; padding: 0; margin: 0; }
+        .gov-footer ul li { margin-bottom: 10px; }
+        .gov-footer a { color: var(--c-gov); text-decoration: none; font-weight: 600;}
+        .gov-footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+
+        <!-- ================= SCREEN 1: LANDING PAGE ================= -->
+        <div id="screen-home" class="screen active" style="padding: 2.5rem; display: flex; align-items: center;">
+            <div class="hero-wrapper">
+                <div class="hero-content">
+                    <div class="header-group" style="text-align: left; margin-bottom: 2rem;">
+                        <img src="sk-official-logo.png" alt="SK Official Logo" style="height: 90px; margin-bottom: 15px; object-fit: contain;" onerror="this.style.display='none'">
+                        <h1 style="font-size: 3.5rem; line-height: 1.1; margin-bottom: 10px;">SKonnect</h1>
+                        <h2 style="font-size: 1.5rem; color: #333;">SK Puerto Princesa</h2>
+                        <h3 style="font-size: 1.1rem; color: var(--text-muted); font-weight: 500;">Transparent Governance Platform</h3>
+                    </div>
+                    
+                    <div class="button-row">
+                        <button class="btn btn-primary" onclick="navigateTo('screen-barangay-transparency')">
+                            Explore Transparency
+                        </button>
+                        <button class="btn btn-accent" onclick="navigateTo('screen-barangay-accomplishment')">
+                            Accomplishment Reports
+                        </button>
+                    </div>
+                </div>
+
+                <div class="hero-visual" id="hero-visual-container">
+                    <div class="glass-panel">
+                        <img id="flash-icon" src="health-icon.png" onerror="this.style.display='none'">
+                        <h2 id="flash-title">HEALTH ACTIVITIES</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 2A: BARANGAY SELECTION (FOR TRANSPARENCY) ================= -->
+        <div id="screen-barangay-transparency" class="screen">
+            <button class="back-btn" onclick="navigateTo('screen-home')">← BACK</button>
+            <div class="header-group">
+                <img src="sk-official-logo.png" alt="SK Official Logo" style="height: 60px; margin-bottom: 10px; object-fit: contain;" onerror="this.style.display='none'">
+                <h1>SKonnect</h1>
+                <h2>SK Puerto Princesa</h2>
+                <h3>Select Barangay for Transparency Plan</h3>
+            </div>
+            <div class="brgy-grid">
+                <div class="brgy-card" onclick="navigateTo('screen-centers')">
+                    <img src="san-pedro-seal.png" alt="San Pedro" class="brgy-logo" onerror="this.style.display='none'">
+                    <h4>SK San Pedro</h4>
+                    <span>AY 2025</span>
+                </div>
+                <div class="brgy-card" onclick="navigateTo('screen-centers')">
+                    <img src="bancao-seal.png" alt="Bancao-Bancao" class="brgy-logo" onerror="this.style.display='none'">
+                    <h4>SK Bancao-Bancao</h4>
+                    <span>AY 2025</span>
+                </div>
+                <div class="brgy-card" onclick="navigateTo('screen-centers')">
+                    <img src="sanjose-seal.png" alt="San Jose" class="brgy-logo" onerror="this.style.display='none'">
+                    <h4>SK San Jose</h4>
+                    <span>AY 2025</span>
+                </div>
+                <div class="brgy-card" onclick="navigateTo('screen-centers')">
+                    <img src="stamonica-seal.png" alt="Sta Monica" class="brgy-logo" onerror="this.style.display='none'">
+                    <h4>SK Sta. Monica</h4>
+                    <span>AY 2025</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 2B: BARANGAY SELECTION (FOR ACCOMPLISHMENTS) ================= -->
+        <div id="screen-barangay-accomplishment" class="screen">
+            <button class="back-btn" onclick="navigateTo('screen-home')">← BACK</button>
+            <div class="header-group">
+                <img src="sk-official-logo.png" alt="SK Official Logo" style="height: 60px; margin-bottom: 10px; object-fit: contain;" onerror="this.style.display='none'">
+                <h1>SKonnect</h1>
+                <h2>SK Puerto Princesa</h2>
+                <h3>Select Barangay to View Accomplishments</h3>
+            </div>
+            <div class="brgy-grid">
+                <div class="brgy-card" onclick="navigateTo('screen-accomplishments-timeline')">
+                    <img src="san-pedro-seal.png" alt="San Pedro" class="brgy-logo" onerror="this.style.display='none'">
+                    <h4>SK San Pedro</h4>
+                    <span>AY 2025</span>
+                </div>
+                <div class="brgy-card" onclick="navigateTo('screen-accomplishments-timeline')">
+                    <img src="bancao-seal.png" alt="Bancao-Bancao" class="brgy-logo" onerror="this.style.display='none'">
+                    <h4>SK Bancao-Bancao</h4>
+                    <span>AY 2025</span>
+                </div>
+                <div class="brgy-card" onclick="navigateTo('screen-accomplishments-timeline')">
+                    <img src="sanjose-seal.png" alt="San Jose" class="brgy-logo" onerror="this.style.display='none'">
+                    <h4>SK San Jose</h4>
+                    <span>AY 2025</span>
+                </div>
+                <div class="brgy-card" onclick="navigateTo('screen-accomplishments-timeline')">
+                    <img src="stamonica-seal.png" alt="Sta Monica" class="brgy-logo" onerror="this.style.display='none'">
+                    <h4>SK Sta. Monica</h4>
+                    <span>AY 2025</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 3: 10 CENTERS OF PARTICIPATION ================= -->
+        <div id="screen-centers" class="screen">
+            <button class="back-btn" onclick="navigateTo('screen-barangay-transparency')">← BACK</button>
+            <div class="header-group">
+                <h1>SKonnect</h1>
+                <h2>10 CENTERS OF PARTICIPATION</h2>
+            </div>
+
+            <div class="centers-grid">
+                <div class="center-card bg-health" onclick="loadTableData('health')">
+                    <div class="hex-icon"><img src="health-icon.png" onerror="this.style.display='none'"></div>HEALTH
+                </div>
+                <div class="center-card bg-edu" onclick="loadTableData('education')">
+                    <div class="hex-icon"><img src="education-icon.png" onerror="this.style.display='none'"></div>EDUCATION
+                </div>
+                <div class="center-card bg-econ" onclick="loadTableData('economic')">
+                    <div class="hex-icon"><img src="economic-icon.png" onerror="this.style.display='none'"></div>ECONOMIC<br>EMPOWERMENT
+                </div>
+                <div class="center-card bg-soc" onclick="loadTableData('social')">
+                    <div class="hex-icon"><img src="social-icon.png" onerror="this.style.display='none'"></div>SOCIAL INCLUSION<br>& EQUITY
+                </div>
+                <div class="center-card bg-peace" onclick="loadTableData('peace')">
+                    <div class="hex-icon"><img src="peace-icon.png" onerror="this.style.display='none'"></div>PEACE BUILDING<br>& SECURITY
+                </div>
+                <div class="center-card bg-gov" onclick="loadTableData('governance')">
+                    <div class="hex-icon"><img src="governance-icon.png" onerror="this.style.display='none'"></div>GOVERNANCE
+                </div>
+                <div class="center-card bg-cit" onclick="loadTableData('citizenship')">
+                    <div class="hex-icon"><img src="citizenship-icon.png" onerror="this.style.display='none'"></div>ACTIVE<br>CITIZENSHIP
+                </div>
+                <div class="center-card bg-env" onclick="loadTableData('environment')">
+                    <div class="hex-icon"><img src="environment-icon.png" onerror="this.style.display='none'"></div>ENVIRONMENT
+                </div>
+                <div class="center-card bg-glob" onclick="loadTableData('global')">
+                    <div class="hex-icon"><img src="global-icon.png" onerror="this.style.display='none'"></div>GLOBAL<br>MOBILITY
+                </div>
+                <div class="center-card bg-agri" onclick="loadTableData('agriculture')">
+                    <div class="hex-icon"><img src="agriculture-icon.png" onerror="this.style.display='none'"></div>AGRICULTURE
+                </div>
+            </div>
+            <div class="centers-footer">IN PHILIPPINE YOUTH DEVELOPMENT PLAN</div>
+        </div>
+
+        <!-- ================= SCREEN 4: DYNAMIC DATA TABLE ================= -->
+        <div id="screen-table" class="screen">
+            <button class="back-btn" onclick="navigateTo('screen-centers')">← BACK</button>
+            
+            <div class="header-group" style="margin-bottom: 1.5rem;">
+                <h1>SKonnect</h1>
+                <h2 style="font-weight: normal; color: #666;">SK Puerto Princesa</h2>
+            </div>
+
+            <div id="dynamic-banner" class="dynamic-banner">
+                <div class="banner-icon-container">
+                    <div class="banner-hex">
+                        <img id="dynamic-icon" src="" alt="Icon">
+                    </div>
+                </div>
+                <h2 id="dynamic-title">TITLE</h2>
+            </div>
+            
+            <div id="dynamic-desc" class="table-desc">Description goes here</div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PPAS</th>
+                            <th>Description</th>
+                            <th>Expected Result</th>
+                            <th>Performance Indicator</th>
+                            <th>Period</th>
+                            <th>Annual MOOE</th>
+                            <th>Total Budget</th>
+                            <th>Responsible</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 5: ACCOMPLISHMENTS TIMELINE (ACCORDION) ================= -->
+        <div id="screen-accomplishments-timeline" class="screen">
+            <button class="back-btn" onclick="navigateTo('screen-barangay-accomplishment')">← BACK</button>
+            
+            <div class="header-group" style="margin-bottom: 1.5rem;">
+                <h1>SKonnect</h1>
+                <h2 style="color: var(--c-peace); font-weight: 800;">2025 ACCOMPLISHMENT REPORT</h2>
+                <h3>Barangay San Pedro</h3>
+            </div>
+
+            <div class="timeline-container">
+                
+                <!-- Say Cheese -->
+                <div class="timeline-item">
+                    <div class="timeline-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="timeline-header-content">
+                            <span class="timeline-date">2025 Highlight</span>
+                            <h3 class="timeline-title">Say Cheese: TOOTHgether We Smile</h3>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-content-inner">
+                            <p class="timeline-desc">A Free Dental Cleaning and Filling (Pasta) program for the youth with 35 beneficiaries aims to promote a Dental Hygiene and education.</p>
+                            <img src="SK57.png" alt="Say Cheese Event" class="timeline-photo" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Worktober -->
+                <div class="timeline-item">
+                    <div class="timeline-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="timeline-header-content">
+                            <span class="timeline-date">2025 Highlight</span>
+                            <h3 class="timeline-title">Worktober: Basic Electronics and Home Appliances Repair Livelihood Training</h3>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-content-inner">
+                            <p class="timeline-desc">Worktober: Basic Electronics and Home Appliances Repair Livelihood Training, was recently concluded—aimed at equipping participants with essential skills in diagnosing and repairing common household appliances. The session focused on hands-on troubleshooting, enabling trainees to identify and resolve issues in malfunctioning devices. This activity was made possible in collaboration with the Barangay LGU, headed by Punong Barangay Hon. Francisco R. Gabuco, and the Committee Chairperson on Livelihood, Hon. Roland Baldonado.</p>
+                            <img src="SK68.png" alt="Worktober Training" class="timeline-photo" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- April 27 -->
+                <div class="timeline-item">
+                    <div class="timeline-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="timeline-header-content">
+                            <span class="timeline-date">April 27, 2025</span>
+                            <h3 class="timeline-title">Morning Walk and Coastal Clean Up Drive</h3>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-content-inner">
+                            <p class="timeline-desc">Together with Palawan Medical City, the Barangay San Pedro Council, and other stakeholders, the event was held on April 27, 2025, at BM Beach.</p>
+                            <img src="SK29.png" alt="Morning Walk Event" class="timeline-photo" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- June 7 -->
+                <div class="timeline-item">
+                    <div class="timeline-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="timeline-header-content">
+                            <span class="timeline-date">June 7, 2025</span>
+                            <h3 class="timeline-title">BINULIGAY 2025 Land and Coastal Clean Up Drive</h3>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-content-inner">
+                            <p class="timeline-desc">The event was successfully conducted on June 7, 2025, at Purok Abanico, Barangay San Pedro, through the collaboration of the AKAPP Environment Team, CYDO, SPYLA, SPYV, and other youth organizations.</p>
+                            <img src="SK32.png" alt="BINULIGAY Event" class="timeline-photo" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- June 10 -->
+                <div class="timeline-item">
+                    <div class="timeline-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="timeline-header-content">
+                            <span class="timeline-date">June 10, 2025</span>
+                            <h3 class="timeline-title">Anti Terrorism, Drug Abuse Prevention and Education Lecture and West Philippine Sea ATIN TO Forum</h3>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-content-inner">
+                            <p class="timeline-desc">The said forum was conducted on June 10, 2025 at Brgy. San Pedro Multi-Purpose Hall together with Barangay Council, staffs and Barangay Peace and order personnel.</p>
+                            <img src="SK40.png" alt="Anti Terrorism Forum" class="timeline-photo" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- June 20 -->
+                <div class="timeline-item">
+                    <div class="timeline-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="timeline-header-content">
+                            <span class="timeline-date">June 20, 2025</span>
+                            <h3 class="timeline-title">SK Monthly Clean Up Drive</h3>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-content-inner">
+                            <p class="timeline-desc">Together with youth volunteers and other youth organizations, the event was successfully conducted on June 20, 2025, at Purok Abanico Coastal Areas.</p>
+                            <img src="SK33.png" alt="Clean Up Drive" class="timeline-photo" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- September 7 (Profiling) -->
+                <div class="timeline-item">
+                    <div class="timeline-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="timeline-header-content">
+                            <span class="timeline-date">September 7, 2025</span>
+                            <h3 class="timeline-title">Conduct of KK Profiling for 2025</h3>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-content-inner">
+                            <p class="timeline-desc">Conducted by the SK Secretary Karl Capero together with the San Pedro Youth Volunteers on September 7, 2025.</p>
+                            <img src="SK50.png" alt="KK Profiling" class="timeline-photo" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- September 7 (Assembly) -->
+                <div class="timeline-item">
+                    <div class="timeline-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="timeline-header-content">
+                            <span class="timeline-date">September 7, 2025</span>
+                            <h3 class="timeline-title">tara, KKape tayo sa ASSEMBLY</h3>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-content-inner">
+                            <p class="timeline-desc">Matagumpay nating naisagawa ang tara, KKape tayo sa ASSEMBLY—ikalawang katipunan ng kabataan ngayong taon, nitong Septyembre 7, 2025 sa Loreto-Santos Lanzanas Central School. Sa pagtitipong ito, matagumpay nating naitala at naaprubahan ang 2026 Annual Budget, nailahad ang Accomplishment Report at Financial Report (March 2025–Present), at naipakilala ang Student Assistance Program (SAP). Naipamigay din ang SAP forms para sa mga kabataang nais makibahagi sa programa.</p>
+                            <img src="SK53.png" alt="KK Assembly" class="timeline-photo" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- December 8 -->
+                <div class="timeline-item">
+                    <div class="timeline-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="timeline-header-content">
+                            <span class="timeline-date">December 8, 2025</span>
+                            <h3 class="timeline-title">Leadership Style and Ctrl + Alt Del Cyber Harassment Training and Seminar</h3>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-content-inner">
+                            <p class="timeline-desc">December 8, 2025 - Building stronger, wiser youth leaders. Today’s sessions on Leadership Styles and Ctrl + Alt + Del Cyber Harassment equipped our SPYLA and SAP participants with knowledge they can use in school, community, and daily life.<br><br>Leadership isn’t just a title—it’s part of our everyday lives, reflected in the choices we make and the values we live by. It always starts within ourselves, before it can inspire others. In light of the growing concerns about cyberbullying and online harassment, these conversations remind our youth of the importance of responsible digital behavior and standing up against harmful online actions.</p>
+                            <img src="SK72.png" alt="Leadership Training" class="timeline-photo" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- ================= GOVERNMENT FOOTER ================= -->
+        <footer class="gov-footer">
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <!-- Replace with actual Republic Logo if you have one -->
+                <img src="republic-logo.png" alt="Republic of the Philippines Logo" style="height: 80px; margin-bottom: 15px;" onerror="this.style.display='none'">
+                <h4>Republic of the Philippines</h4>
+                <p>All content is in the public domain unless otherwise stated.</p>
+            </div>
+            
+            <div>
+                <h4>About GOVPH</h4>
+                <p style="margin-bottom: 15px;">Learn more about the Philippine government, its structure, how government works and the people behind it.</p>
+                <ul>
+                    <li><a href="https://www.gov.ph" target="_blank">GOV.PH</a></li>
+                    <li><a href="https://data.gov.ph" target="_blank">Open Data Portal</a></li>
+                    <li><a href="https://www.officialgazette.gov.ph" target="_blank">Official Gazette</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4>Government Links</h4>
+                <ul>
+                    <li><a href="https://op-proper.gov.ph" target="_blank">Office of the President</a></li>
+                    <li><a href="https://ovp.gov.ph" target="_blank">Office of the Vice President</a></li>
+                    <li><a href="https://legacy.senate.gov.ph" target="_blank">Senate of the Philippines</a></li>
+                    <li><a href="https://www.congress.gov.ph" target="_blank">House of Representatives</a></li>
+                    <li><a href="https://sc.judiciary.gov.ph" target="_blank">Supreme Court</a></li>
+                    <li><a href="https://ca.judiciary.gov.ph" target="_blank">Court of Appeals</a></li>
+                    <li><a href="https://sb.judiciary.gov.ph" target="_blank">Sandiganbayan</a></li>
+                </ul>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        const skData = {
+            "health": {
+                color: "var(--c-health)",
+                icon: "health-icon.png", 
+                title: "HEALTH ACTIVITIES",
+                desc: "FOR THE YOUTH TO PARTICIPATE IN MULTIGENITURES, MULTISECTORAL, AND INCLUSIVE PROGRAMS, PROJECTS, ACTIVITIES AND SERVICES ON HEALTH AND HEALTH FINANCIAL RISK PROTECTION - WITH SERIOUS CONSIDERATION OF NUTRITION, REPRODUCTIVE HEALTH AND PSYCHOSOCIAL CONCERNS -THAT PROMOTE THE YOUTH'S HEALTH AND WELL-BEING.",
+                rows: [
+                    ["Medical and Dental Mission", "A program that aims to improve the overall health and well-being of the youth residing in Barangay San Pedro by providing equitable access to medical and dental service.", "Conducted a medical and dental mission benefitted at least 100 youth and provided meals and snacks to facilitators.", "No. of youth received medical and dental services. (Male: Female:)", "Jan - Dec 2025", "20,000", "20,000", "SK Committee on Health"]
+                ]
+            },
+            "education": {
+                color: "var(--c-edu)",
+                icon: "education-icon.png", 
+                title: "EDUCATION ACTIVITIES",
+                desc: "FOR THE YOUTH TO PARTICIPATE IN ACCESSIBLE, DEVELOPMENT, QUALITY, AND RELEVANT FORMAL, NON-FORMAL AND INFORMAL LIFELONG LEARNING AND TRAINING THAT PREPARES GRADUATES TO BE GLOBALLY COMPETITIVE BUT RESPONSIVE TO NATIONAL NEEDS.",
+                rows: [
+                    ["Student Assistance Program", "A program designed to provide educational financial assistance to indigent residents who are enrolled at the secondary and tertiary levels of education.", "Provided student assistance to 343 students in every quarter.", "(Highschool: 218; College: 125)", "Jan - Dec 2025", "1,279,000.00", "1,279,000.00", "SK Committee on Education"]
+                ]
+            },
+            "economic": {
+                color: "var(--c-econ)",
+                icon: "economic-icon.png", 
+                title: "ECONOMIC EMPOWERMENT",
+                desc: "FOR THE YOUTH TO PARTICIPATE IN THE ECONOMY, AS EMPOWERED EMPLOYEES AND/OR ENTREPRENEURS WHO ARE PRODUCTIVELY ENGAGED IN GAINFUL AND DECENT WORK AND/OR BUSINESS.",
+                rows: [
+                    ["Livelihood Trainings and Seminars", "A program that aims to augment their understanding and enhance their abilities, individuals can participate in continual learning and skill-building training.", "Conducted training/seminars with at least 30 youth participated and provided meals.", "No. of training, seminars, and workshops conducted, and youth participated.", "Jun - Dec 2025", "50,000", "50,000", "SK Committee on Econ. Emp."]
+                ]
+            },
+            "social": {
+                color: "var(--c-soc)",
+                icon: "social-icon.png", 
+                title: "SOCIAL INCLUSION & EQUITY",
+                desc: "FOR THE YOUTH TO PARTICIPATE IN A PEACEFUL AND JUST SOCIETY THAT AFFORDS THEM WITH EQUAL AND EQUITABLE OPPORTUNITY, SOCIAL SECURITY AND PROTECTION IN ALL ASPECTS OF DEVELOPMENT.",
+                rows: [
+                    ["Pride Month Celebration", "To provide an avenue for the youth of the LGBQTIA+ community, encouraging them to participate in national celebration for LGBQTIA+ rights and showcasing their talents.", "At least 50 youths participated and provided meals and snacks to them.", "Number of youth participated in the event.", "Jan - Dec 2025", "5,000.00", "5,000.00", "SK Committee on Social Inclusion"]
+                ]
+            },
+            "peace": {
+                color: "var(--c-peace)",
+                icon: "peace-icon.png", 
+                title: "PEACE BUILDING & SECURITY",
+                desc: "FOR THE YOUTH TO PARTICIPATE IN PROMOTING HUMAN SECURITY, INCLUDING PUBLIC SAFETY AND ORDER, PROTECTING THE YOUTH IN CONFLICT AREAS, SAFEGUARDING TERRITORIAL INTEGRITY.",
+                rows: [
+                    ["ALISTO: DRRM Campaign", "A project that aims to provide information and education campaign materials to conspicuous places of the Barangay.", "Provided at least seventeen (17) IEC materials for the 17 Puroks posted in conspicuous places.", "No. of IEC materials installed", "Jan - Dec 2025", "5,000.00", "5,000.00", "SK Committee on Peace Building"]
+                ]
+            },
+            "governance": {
+                color: "var(--c-gov)",
+                icon: "governance-icon.png", 
+                title: "GOVERNANCE",
+                desc: "FOR THE YOUTH TO SUPPORT SANGGUNIANG KABATAAN IMPLEMENTATION OF PROGRAMS AND ACTIVITIES, ENSURE UNIVERSAL PARTICIPATION, AND PROMOTE YOUTH PARTICIPATION IN GOVERNMENT.",
+                rows: [
+                    ["San Pedro Youth Leadership Academy", "This program provides a structured platform for nurturing leadership skills, fostering civic engagement, and promoting social responsibility.", "Conducted events/activities attended by at least 80 participants.", "No. of activities conducted; no. of youth participated; no. of supplies.", "Jan - Dec 2025", "50,000.00", "50,000.00", "SK Officials"]
+                ]
+            },
+            "citizenship": {
+                color: "var(--c-cit)",
+                icon: "citizenship-icon.png", 
+                title: "ACTIVE CITIZENSHIP",
+                desc: "FOR THE YOUTH TO PARTICIPATE IN COMMUNITY DEVELOPMENT AND NATIONAL BUILDING THROUGH MEANINGFUL, ACTIVE, SUSTAINABLE, PRODUCTIVE AND PATRIOTIC ENGAGEMENT.",
+                rows: [
+                    ["KK Assemblies", "To create concrete plan with the Katipunan ng Kabataan of the Bgy. provided in RA 10742.", "Conducted 2 KK Assemblies and engaged atleast 250 participants, and provided prizes.", "No. of assemblies conducted and No. of males and females participated.", "1st & 2nd Sem", "40,000.00", "40,000.00", "SK Officials"]
+                ]
+            },
+            "environment": {
+                color: "var(--c-env)",
+                icon: "environment-icon.png", 
+                title: "ENVIRONMENT",
+                desc: "FOR THE YOUTH TO PARTICIPATE IN THE PLANNING, IMPLEMENTATION, MONITORING, AND EVALUATION OF CHILD AND YOUTH-FRIENDLY PROGRAMS ON ENVIRONMENTAL PROTECTION.",
+                rows: [
+                    ["Monthly Clean-up Drive", "The objective is to foster a cleaner and healthier environment by organizing a monthly clean-up drive, encouraging active participation from the youth.", "Conducted 12 clean-up drives program attended by at least 150 participants.", "No. of clean up drives conducted, no. of cleaning supplies purchased.", "Jan - Dec 2025", "36,000.00", "36,000.00", "SK Committee on Environment"]
+                ]
+            },
+            "global": {
+                color: "var(--c-glob)",
+                icon: "global-icon.png", 
+                title: "GLOBAL MOBILITY",
+                desc: "FACILITATING YOUTH PARTICIPATION IN GLOBAL EXCHANGES AND INTERNATIONAL YOUTH NETWORKS TO FOSTER CROSS-CULTURAL UNDERSTANDING AND GLOBAL COMPETITIVENESS.",
+                rows: [
+                    ["Data Pending", "Program details currently being finalized for the current fiscal year.", "-", "-", "-", "-", "-", "SK Officials"]
+                ]
+            },
+            "agriculture": {
+                color: "var(--c-agri)",
+                icon: "agriculture-icon.png", 
+                title: "AGRICULTURE",
+                desc: "FOR THE YOUTH TO PARTICIPATE AND ENGAGE THEMSELVES TO A SUSTAINABLE SANGGUNIANG KABATAAN AGRICULTURAL PROGRAMS PROMOTING EFFICIENT INITIATIVES TO COMBAT FOOD HUNGER.",
+                rows: [
+                    ["AgrikaAHA laman", "Encouraging the younger generation to view agriculture as viable business ventures requires information dissemination, training, seminars, and workshops.", "Conducted training/seminars with at least 30 youth participated.", "No. of training, seminars, and workshops conducted, and youth participated.", "Jan - Dec 2025", "7,516.98", "7,516.98", "SK Committee on Agriculture"]
+                ]
+            }
+        };
+
+        // Navigation Controller: The window.scrollTo has been permanently removed!
+        function navigateTo(targetScreenId) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById(targetScreenId).classList.add('active');
+        }
+
+        // Dynamic Table Loader
+        function loadTableData(categoryId) {
+            const data = skData[categoryId];
+            
+            const banner = document.getElementById('dynamic-banner');
+            banner.style.backgroundColor = data.color;
+            
+            document.getElementById('dynamic-title').innerText = data.title;
+            
+            const descBox = document.getElementById('dynamic-desc');
+            descBox.innerText = data.desc;
+            descBox.style.borderLeftColor = data.color;
+            
+            const iconImg = document.getElementById('dynamic-icon');
+            if(data.icon) {
+                iconImg.src = data.icon;
+                iconImg.style.display = 'block';
+            } else {
+                iconImg.style.display = 'none';
+            }
+
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            data.rows.forEach(rowData => {
+                const tr = document.createElement('tr');
+                rowData.forEach(cellData => {
+                    const td = document.createElement('td');
+                    td.innerText = cellData;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+
+            navigateTo('screen-table');
+        }
+
+        // Animated Flashing Dashboard Setup
+        const centersList = ["health", "education", "economic", "social", "peace", "governance", "citizenship", "environment", "global", "agriculture"];
+        let flashIndex = 0;
+
+        function flashNextCenter() {
+            flashIndex = (flashIndex + 1) % centersList.length;
+            const centerKey = centersList[flashIndex];
+            const centerData = skData[centerKey];
+            
+            document.getElementById('flash-title').innerText = centerData.title;
+            
+            const iconImg = document.getElementById('flash-icon');
+            if(centerData.icon) { 
+                iconImg.src = centerData.icon; 
+                iconImg.style.display = 'block'; 
+            } else { 
+                iconImg.style.display = 'none'; 
+            }
+            
+            document.getElementById('hero-visual-container').style.backgroundColor = centerData.color;
+        }
+
+        // Trigger the flash effect every 3 seconds
+        setInterval(flashNextCenter, 3000);
+
+    </script>
+</body>
+</html>
